@@ -1,0 +1,159 @@
+@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap');
+@import url('https://api.fontshare.com/v2/css?f[]=clash-display@400,500,600,700&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --gradient-primary: linear-gradient(135deg, #ed771c 0%, #f19440 50%, #f6ba77 100%);
+  --gradient-dark: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+  --gradient-mesh: radial-gradient(at 40% 20%, hsla(28,89%,52%,0.1) 0px, transparent 50%),
+    radial-gradient(at 80% 0%, hsla(189,100%,56%,0.08) 0px, transparent 50%),
+    radial-gradient(at 0% 50%, hsla(355,100%,93%,0.1) 0px, transparent 50%),
+    radial-gradient(at 80% 50%, hsla(340,100%,76%,0.08) 0px, transparent 50%),
+    radial-gradient(at 0% 100%, hsla(22,100%,77%,0.12) 0px, transparent 50%);
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  font-family: 'Outfit', system-ui, sans-serif;
+  background: var(--gradient-dark);
+  min-height: 100vh;
+}
+
+.font-display {
+  font-family: 'Clash Display', system-ui, sans-serif;
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb {
+  background: rgba(237, 119, 28, 0.4);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(237, 119, 28, 0.6);
+}
+
+/* Glass morphism */
+.glass {
+  background: rgba(255, 255, 255, 0.03);
+  backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.glass-light {
+  background: rgba(255, 255, 255, 0.06);
+  backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+/* Gradient text */
+.gradient-text {
+  background: var(--gradient-primary);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* Glow effects */
+.glow-orange {
+  box-shadow: 0 0 40px rgba(237, 119, 28, 0.3);
+}
+
+.glow-text {
+  text-shadow: 0 0 40px rgba(237, 119, 28, 0.5);
+}
+
+/* Button styles */
+.btn-primary {
+  @apply px-6 py-3 bg-gradient-to-r from-primary-500 to-primary-400 text-white font-medium rounded-xl;
+  @apply hover:from-primary-600 hover:to-primary-500 transition-all duration-300;
+  @apply shadow-lg shadow-primary-500/25 hover:shadow-xl hover:shadow-primary-500/30;
+  @apply active:scale-[0.98];
+}
+
+.btn-secondary {
+  @apply px-6 py-3 glass text-white/80 font-medium rounded-xl;
+  @apply hover:bg-white/10 transition-all duration-300;
+  @apply active:scale-[0.98];
+}
+
+/* Input styles */
+.input-field {
+  @apply w-full px-4 py-3 glass-light rounded-xl text-white placeholder:text-white/40;
+  @apply focus:outline-none focus:ring-2 focus:ring-primary-500/50 focus:border-primary-500/50;
+  @apply transition-all duration-300;
+}
+
+/* Card styles */
+.card {
+  @apply glass rounded-2xl p-6;
+  @apply hover:bg-white/[0.06] transition-all duration-300;
+}
+
+/* Animation delays */
+.delay-100 { animation-delay: 100ms; }
+.delay-200 { animation-delay: 200ms; }
+.delay-300 { animation-delay: 300ms; }
+.delay-400 { animation-delay: 400ms; }
+.delay-500 { animation-delay: 500ms; }
+
+/* Calendar styles */
+.calendar-day {
+  @apply w-10 h-10 flex items-center justify-center rounded-lg text-sm;
+  @apply transition-all duration-200 cursor-pointer;
+}
+
+.calendar-day:hover:not(.disabled) {
+  @apply bg-primary-500/20;
+}
+
+.calendar-day.selected {
+  @apply bg-primary-500 text-white;
+}
+
+.calendar-day.in-range {
+  @apply bg-primary-500/30;
+}
+
+.calendar-day.disabled {
+  @apply text-white/20 cursor-not-allowed;
+}
+
+.calendar-day.has-leave {
+  @apply ring-2 ring-primary-400/60;
+}
+
+/* Mesh background */
+.mesh-bg {
+  background: var(--gradient-mesh);
+}
+
+/* Floating shapes */
+.floating-shape {
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(60px);
+  opacity: 0.5;
+  pointer-events: none;
+}
+
