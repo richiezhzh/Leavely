@@ -1,7 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
-import { CalendarPlus, Copy, Check, ExternalLink, Download, X } from 'lucide-react';
+import { Download, Calendar, X } from 'lucide-react';
 import { useLanguage } from '@/lib/i18n';
 
 interface CalendarSubscribeProps {
@@ -10,35 +9,11 @@ interface CalendarSubscribeProps {
 }
 
 export default function CalendarSubscribe({ isOpen, onClose }: CalendarSubscribeProps) {
-  const [copied, setCopied] = useState(false);
-  const [subscribeUrl, setSubscribeUrl] = useState('');
-  const { t } = useLanguage();
-
-  useEffect(() => {
-    // 在客户端获取完整URL
-    if (typeof window !== 'undefined') {
-      setSubscribeUrl(`${window.location.origin}/api/calendar`);
-    }
-  }, []);
-
-  const handleCopy = async () => {
-    try {
-      await navigator.clipboard.writeText(subscribeUrl);
-      setCopied(true);
-      setTimeout(() => setCopied(false), 2000);
-    } catch (err) {
-      console.error('Failed to copy:', err);
-    }
-  };
+  const { t, language } = useLanguage();
 
   const handleDownload = () => {
     window.location.href = '/api/calendar';
-  };
-
-  const handleAddToOutlook = () => {
-    // Outlook Web calendar subscription URL
-    const encodedUrl = encodeURIComponent(subscribeUrl);
-    window.open(`https://outlook.office.com/calendar/0/addfromweb?url=${encodedUrl}`, '_blank');
+    onClose();
   };
 
   if (!isOpen) return null;
@@ -64,11 +39,11 @@ export default function CalendarSubscribe({ isOpen, onClose }: CalendarSubscribe
         {/* Header */}
         <div className="flex items-center gap-3 mb-6">
           <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-primary-400 to-primary-600 flex items-center justify-center">
-            <CalendarPlus className="w-6 h-6 text-white" />
+            <Calendar className="w-6 h-6 text-white" />
           </div>
           <div>
             <h3 className="font-display font-semibold text-xl text-white">
-              {t.calendarIntegration.subscribeCalendar}
+              {t.calendarIntegration.exportAll}
             </h3>
             <p className="text-sm text-white/50">Outlook / Google / Apple Calendar</p>
           </div>
@@ -76,65 +51,38 @@ export default function CalendarSubscribe({ isOpen, onClose }: CalendarSubscribe
 
         {/* Description */}
         <p className="text-sm text-white/60 mb-6">
-          {t.calendarIntegration.subscribeDesc}
+          {language === 'zh' 
+            ? '下载包含所有团队休假信息的 ICS 文件，可导入到 Outlook、Google 日历或 Apple 日历中。'
+            : 'Download an ICS file containing all team leave information. Import it into Outlook, Google Calendar, or Apple Calendar.'
+          }
         </p>
 
-        {/* URL Input */}
-        <div className="flex items-center gap-2 mb-6">
-          <div className="flex-1 px-4 py-3 bg-white/5 rounded-xl text-white/80 text-sm font-mono truncate border border-white/10">
-            {subscribeUrl}
-          </div>
-          <button
-            onClick={handleCopy}
-            className={`px-4 py-3 rounded-xl transition-all flex items-center gap-2 ${
-              copied 
-                ? 'bg-emerald-500/20 text-emerald-400' 
-                : 'bg-white/10 text-white hover:bg-white/20'
-            }`}
-          >
-            {copied ? <Check className="w-4 h-4" /> : <Copy className="w-4 h-4" />}
-            <span className="text-sm">{copied ? t.calendarIntegration.copied : t.calendarIntegration.copyLink}</span>
-          </button>
-        </div>
-
-        {/* Action Buttons */}
-        <div className="space-y-3">
-          <button
-            onClick={handleAddToOutlook}
-            className="w-full flex items-center justify-center gap-3 px-4 py-3 bg-blue-500/20 text-blue-400 rounded-xl hover:bg-blue-500/30 transition-colors"
-          >
-            <ExternalLink className="w-5 h-5" />
-            {t.calendarIntegration.addToOutlook}
-          </button>
-          
-          <button
-            onClick={handleDownload}
-            className="w-full flex items-center justify-center gap-3 px-4 py-3 bg-white/10 text-white/80 rounded-xl hover:bg-white/20 transition-colors"
-          >
-            <Download className="w-5 h-5" />
-            {t.calendarIntegration.downloadICS}
-          </button>
-        </div>
+        {/* Download Button */}
+        <button
+          onClick={handleDownload}
+          className="w-full flex items-center justify-center gap-3 px-4 py-4 bg-gradient-to-r from-primary-500 to-primary-400 text-white rounded-xl hover:from-primary-600 hover:to-primary-500 transition-all shadow-lg shadow-primary-500/25"
+        >
+          <Download className="w-5 h-5" />
+          {t.calendarIntegration.downloadICS}
+        </button>
 
         {/* Instructions */}
         <div className="mt-6 pt-6 border-t border-white/10">
           <h4 className="text-sm font-medium text-white mb-3">
-            {t.language === 'zh' ? '如何订阅：' : 'How to subscribe:'}
+            {language === 'zh' ? '如何导入到 Outlook：' : 'How to import to Outlook:'}
           </h4>
           <ol className="text-xs text-white/50 space-y-2 list-decimal list-inside">
-            {t.language === 'zh' ? (
+            {language === 'zh' ? (
               <>
-                <li>复制上方链接</li>
-                <li>打开 Outlook → 添加日历 → 从网络订阅</li>
-                <li>粘贴链接并保存</li>
-                <li>日历会自动同步团队休假信息</li>
+                <li>点击上方按钮下载 ICS 文件</li>
+                <li>双击下载的文件，Outlook 会自动打开</li>
+                <li>点击"保存并关闭"添加到日历</li>
               </>
             ) : (
               <>
-                <li>Copy the link above</li>
-                <li>Open Outlook → Add Calendar → Subscribe from web</li>
-                <li>Paste the link and save</li>
-                <li>Calendar will auto-sync team leave info</li>
+                <li>Click the button above to download the ICS file</li>
+                <li>Double-click the downloaded file, Outlook will open automatically</li>
+                <li>Click "Save & Close" to add to your calendar</li>
               </>
             )}
           </ol>
@@ -143,4 +91,3 @@ export default function CalendarSubscribe({ isOpen, onClose }: CalendarSubscribe
     </div>
   );
 }
-

@@ -1,13 +1,13 @@
 'use client';
 
-import { useState, useRef, useEffect } from 'react';
+import { useState } from 'react';
 import { format, differenceInDays } from 'date-fns';
 import { zhCN, enUS } from 'date-fns/locale';
-import { Calendar, Phone, Trash2, User, Loader2, CalendarPlus, Download, ExternalLink, ChevronDown } from 'lucide-react';
+import { Calendar, Phone, Trash2, User, Loader2, Download } from 'lucide-react';
 import { LeaveRequest } from '@/types';
 import { useLeaveStore } from '@/store/leaveStore';
 import { useLanguage } from '@/lib/i18n';
-import { generateICSEvent, downloadICS, generateOutlookWebLink, generateGoogleCalendarLink } from '@/lib/calendar';
+import { generateICSEvent, downloadICS } from '@/lib/calendar';
 
 interface LeaveCardProps {
   leave: LeaveRequest;
@@ -17,25 +17,12 @@ interface LeaveCardProps {
 export default function LeaveCard({ leave, showActions = true }: LeaveCardProps) {
   const { removeLeave } = useLeaveStore();
   const [isDeleting, setIsDeleting] = useState(false);
-  const [showCalendarMenu, setShowCalendarMenu] = useState(false);
-  const menuRef = useRef<HTMLDivElement>(null);
   const { t, language } = useLanguage();
   const dateLocale = language === 'zh' ? zhCN : enUS;
   
   const startDate = new Date(leave.startDate);
   const endDate = new Date(leave.endDate);
   const duration = differenceInDays(endDate, startDate) + 1;
-
-  // 点击外部关闭菜单
-  useEffect(() => {
-    function handleClickOutside(event: MouseEvent) {
-      if (menuRef.current && !menuRef.current.contains(event.target as Node)) {
-        setShowCalendarMenu(false);
-      }
-    }
-    document.addEventListener('mousedown', handleClickOutside);
-    return () => document.removeEventListener('mousedown', handleClickOutside);
-  }, []);
 
   const handleDelete = async () => {
     if (confirm(t.leaveCard.confirmDelete)) {
@@ -49,19 +36,6 @@ export default function LeaveCard({ leave, showActions = true }: LeaveCardProps)
     const ics = generateICSEvent(leave);
     const filename = `leave-${leave.name}-${leave.startDate}.ics`;
     downloadICS(ics, filename);
-    setShowCalendarMenu(false);
-  };
-
-  const handleAddToOutlook = () => {
-    const url = generateOutlookWebLink(leave);
-    window.open(url, '_blank');
-    setShowCalendarMenu(false);
-  };
-
-  const handleAddToGoogle = () => {
-    const url = generateGoogleCalendarLink(leave);
-    window.open(url, '_blank');
-    setShowCalendarMenu(false);
   };
 
   return (
@@ -115,44 +89,15 @@ export default function LeaveCard({ leave, showActions = true }: LeaveCardProps)
       {/* Actions */}
       {showActions && (
         <div className="mt-4 flex justify-end items-center gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
-          {/* Calendar Menu */}
-          <div className="relative" ref={menuRef}>
-            <button
-              onClick={() => setShowCalendarMenu(!showCalendarMenu)}
-              className="flex items-center gap-2 px-3 py-2 rounded-lg text-primary-400 hover:bg-primary-500/10 transition-colors text-sm"
-            >
-              <CalendarPlus className="w-4 h-4" />
-              {t.calendarIntegration.addToCalendar}
-              <ChevronDown className={`w-3 h-3 transition-transform ${showCalendarMenu ? 'rotate-180' : ''}`} />
-            </button>
-            
-            {/* Dropdown Menu */}
-            {showCalendarMenu && (
-              <div className="absolute right-0 bottom-full mb-2 w-56 glass rounded-xl p-2 shadow-xl animate-scale-in z-50">
-                <button
-                  onClick={handleDownloadICS}
-                  className="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-white/80 hover:bg-white/10 transition-colors text-sm text-left"
-                >
-                  <Download className="w-4 h-4 text-primary-400" />
-                  {t.calendarIntegration.downloadICS}
-                </button>
-                <button
-                  onClick={handleAddToOutlook}
-                  className="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-white/80 hover:bg-white/10 transition-colors text-sm text-left"
-                >
-                  <ExternalLink className="w-4 h-4 text-blue-400" />
-                  {t.calendarIntegration.addToOutlook}
-                </button>
-                <button
-                  onClick={handleAddToGoogle}
-                  className="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-white/80 hover:bg-white/10 transition-colors text-sm text-left"
-                >
-                  <ExternalLink className="w-4 h-4 text-emerald-400" />
-                  {t.calendarIntegration.addToGoogle}
-                </button>
-              </div>
-            )}
-          </div>
+          {/* Download ICS Button */}
+          <button
+            onClick={handleDownloadICS}
+            className="flex items-center gap-2 px-3 py-2 rounded-lg text-primary-400 hover:bg-primary-500/10 transition-colors text-sm"
+            title={t.calendarIntegration.downloadICS}
+          >
+            <Download className="w-4 h-4" />
+            {t.calendarIntegration.downloadICS}
+          </button>
 
           {/* Delete Button */}
           <button
